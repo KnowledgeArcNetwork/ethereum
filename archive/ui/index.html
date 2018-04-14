@@ -1,0 +1,74 @@
+<html>
+    <head>
+        <title>Archived Item Example</title>
+
+        <style type="text/css">
+        #fields #name {
+            display: inline-block;
+            width: 8em;
+        }
+        </style>
+    </head>
+
+    <body>
+        <h1>Archived Item</h1>
+
+        <h2>Metadata</h2>
+
+        <div>
+            <span>Total Fields:</span>
+            <span id="fieldCount"></span>
+        </div>
+
+
+        <div id="fields">
+        </div>
+
+        <h2>File</h2>
+
+        <div>
+            <span>File Hash:</span>
+            <span id="fileHash"></span>
+        </div>
+
+        <script id="metadataFieldTemplate" type="text/x-jquery-tmpl">
+            <div>
+                <span id="name">${name}:</span>
+                <span id="value">${value}</span>
+            </div>
+        </script>
+
+        <script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="jquery.tmpl.min.js"></script>
+        <script src="abi.js"></script>
+
+        <script language="Javascript" type="text/javascript">
+        $(document).ready(function() {
+            var web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/"));
+
+            var contractAddress = "0xabaf9d2955e0ce3e53d0fd964e761017d0a0a957";
+
+            var contract = web3.eth.contract(abi).at(contractAddress);
+
+            var fieldCount = Number(contract.getFieldCount.call());
+
+            $("#fieldCount").text(fieldCount);
+
+            var data = [];
+
+            for (var i = 0; i < fieldCount; i++) {
+                data[i] =
+                    {
+                        "name":String(contract.getFieldName.call(i)),
+                        "value":String(contract.getFieldValue.call(i))
+                    };
+            }
+
+            $('#metadataFieldTemplate').tmpl(data).appendTo('#fields');
+
+            $('#fileHash').text(contract.getFileHash.call());
+        });
+        </script>
+    </body>
+</html>
